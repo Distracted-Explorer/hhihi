@@ -1,51 +1,53 @@
 const express = require("express");
 const multer = require("multer");
-const cors = require("cors");
 
 const app = express();
-
-app.use(cors());
+const PORT = process.env.PORT || 3000;
 
 const upload = multer({
     storage: multer.memoryStorage()
 });
 
-app.post("/upload", upload.single("image"), async (req, res) => {
+app.post("/analyze", upload.single("image"), async (req, res) => {
     try {
         const image = req.file;
         const timestamp = req.body.timestamp;
 
         if (!image) {
             return res.status(400).json({
-                status: "error",
-                message: "No image uploaded",
-                id: null
+                success: false,
+                message: "Image missing"
             });
         }
 
-        console.log("Image:", image.originalname);
         console.log("Timestamp:", timestamp);
+        console.log("Image Name:", image.originalname);
+        console.log("Image Size:", image.size);
 
-        // TODO:
-        // Send image.buffer to AI model
+        // Process image here
+        // Call Gemini/OpenAI/YOLO/etc
+
+        const result = {
+            detected_objects: ["person", "phone"],
+            description: "Person holding a phone",
+            timestamp: timestamp
+        };
 
         res.json({
-            status: "success",
-            message: "Image received",
-            id: Date.now().toString()
+            success: true,
+            result
         });
 
-    } catch (err) {
-        console.error(err);
+    } catch (error) {
+        console.error(error);
 
         res.status(500).json({
-            status: "error",
-            message: err.message,
-            id: null
+            success: false,
+            error: error.message
         });
     }
 });
 
-app.listen(3000, () => {
-    console.log("Server running on port 3000");
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on port ${PORT}`);
 });
