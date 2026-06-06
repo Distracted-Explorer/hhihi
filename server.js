@@ -1,7 +1,9 @@
 const express = require("express");
+const { log } = require("node:console");
 const app = express();
 
 app.get("/", (req, res) => {
+  console.log("Hihi");
     res.json({
         status: "online"
     });
